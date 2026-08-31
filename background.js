@@ -1,6 +1,7 @@
 importScripts("lib/organize.js");
 
 const PENDING_KEY = "pendingBookmarkIds";
+const ORGANIZING_FLAG_KEY = "organizeInProgress";
 
 async function getPending() {
   const data = await chrome.storage.local.get(PENDING_KEY);
@@ -25,20 +26,28 @@ chrome.runtime.onInstalled.addListener(async () => updateBadge((await getPending
 chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
   if (!bookmark.url) return; // folders don't need filing
 
-  // Ignore bookmarks we ourselves just created inside Organized Bookmarks --
-  // otherwise every "file new bookmarks" action would immediately re-flag
-  // its own copies as new, unfiled bookmarks.
-  const root = await ensureOrganizedRoot();
-  let parentId = bookmark.parentId;
-  const visited = new Set();
-  while (parentId && !visited.has(parentId)) {
-    if (parentId === root.id) return;
-    visited.add(parentId);
-    try {
-      const [node] = await chrome.bookmarks.get(parentId);
-      parentId = node.parentId;
-    } catch {
-      break;
+  // While a bulk operation (organize / repair) is running in the popup, its
+  // own creates fire this same event hundreds or thousands of times. Skip
+  // all of them outright rather than re-checking each one individually.
+  const { [ORGANIZING_FLAG_KEY]: organizing } = await chrome.storage.local.get(ORGANIZING_FLAG_KEY);
+  if (organizing) return;
+
+  // Ignore bookmarks that land inside Organized Bookmarks by some other
+  // route too. Read-only lookup -- never creates the folder -- so this
+  // listener can't itself cause the duplicate-folder bug.
+  const root = await findOrganizedRoot();
+  if (root) {
+    let parentId = bookmark.parentId;
+    const visited = new Set();
+    while (parentId && !visited.has(parentId)) {
+      if (parentId === root.id) return;
+      visited.add(parentId);
+      try {
+        const [node] = await chrome.bookmarks.get(parentId);
+        parentId = node.parentId;
+      } catch {
+        break;
+      }
     }
   }
 

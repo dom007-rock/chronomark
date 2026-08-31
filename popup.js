@@ -1,9 +1,11 @@
 const pendingLine = document.getElementById("pendingLine");
 const fileNewBtn = document.getElementById("fileNewBtn");
 const organizeAllBtn = document.getElementById("organizeAllBtn");
+const fixDuplicatesBtn = document.getElementById("fixDuplicatesBtn");
 const status = document.getElementById("status");
 
 const PENDING_KEY = "pendingBookmarkIds";
+const ORGANIZING_FLAG_KEY = "organizeInProgress";
 
 async function refreshPendingLine() {
   const data = await chrome.storage.local.get(PENDING_KEY);
@@ -17,6 +19,18 @@ async function refreshPendingLine() {
     fileNewBtn.disabled = false;
   }
   return pending;
+}
+
+// Wraps a bulk bookmark-creating action so background.js's new-bookmark
+// listener ignores every create that happens along the way, instead of
+// treating our own copies as new unfiled bookmarks.
+async function runAsBulkOperation(fn) {
+  await chrome.storage.local.set({ [ORGANIZING_FLAG_KEY]: true });
+  try {
+    return await fn();
+  } finally {
+    await chrome.storage.local.set({ [ORGANIZING_FLAG_KEY]: false });
+  }
 }
 
 fileNewBtn.addEventListener("click", async () => {
@@ -34,7 +48,7 @@ fileNewBtn.addEventListener("click", async () => {
     }
   }
 
-  const result = await organizeBookmarks(nodes);
+  const result = await runAsBulkOperation(() => organizeBookmarks(nodes));
   await chrome.storage.local.set({ [PENDING_KEY]: [] });
   await chrome.action.setBadgeText({ text: "" });
 
@@ -47,9 +61,11 @@ organizeAllBtn.addEventListener("click", async () => {
   organizeAllBtn.disabled = true;
   status.textContent = "Scanning all bookmarks… this may take a moment for large collections.";
 
-  const root = await ensureOrganizedRoot();
-  const bookmarks = await getAllBookmarks(root.id);
-  const result = await organizeBookmarks(bookmarks);
+  const result = await runAsBulkOperation(async () => {
+    const root = await ensureOrganizedRoot();
+    const bookmarks = await getAllBookmarks(root.id);
+    return organizeBookmarks(bookmarks);
+  });
 
   // A full sweep covers everything, including whatever was pending.
   await chrome.storage.local.set({ [PENDING_KEY]: [] });
@@ -59,6 +75,24 @@ organizeAllBtn.addEventListener("click", async () => {
     `Done. Filed ${result.filed} bookmarks, skipped ${result.skipped} already-filed duplicates, into "Organized Bookmarks".`;
   organizeAllBtn.disabled = false;
   await refreshPendingLine();
+});
+
+fixDuplicatesBtn.addEventListener("click", async () => {
+  fixDuplicatesBtn.disabled = true;
+  status.textContent = "Checking for duplicate 'Organized Bookmarks' folders…";
+
+  const result = await runAsBulkOperation(() => consolidateDuplicateRoots());
+
+  if (result.duplicatesRemoved === 0) {
+    status.textContent = "No duplicate folders found — nothing to fix.";
+  } else {
+    status.textContent =
+      `Merged ${result.merged} bookmark${result.merged === 1 ? "" : "s"} and removed ` +
+      `${result.duplicatesRemoved} duplicate folder${result.duplicatesRemoved === 1 ? "" : "s"}. ` +
+      `Everything now lives in one "Organized Bookmarks" folder.`;
+  }
+
+  fixDuplicatesBtn.disabled = false;
 });
 
 refreshPendingLine();
