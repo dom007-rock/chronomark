@@ -57,3 +57,16 @@ chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
     await setPending(pending);
   }
 });
+
+// A bookmark removed before it was ever filed should drop off the pending
+// count too -- otherwise the badge keeps showing a bookmark that no longer
+// exists until the next unrelated file/organize click happens to clear it.
+chrome.bookmarks.onRemoved.addListener(async (id) => {
+  const { [ORGANIZING_FLAG_KEY]: organizing } = await chrome.storage.local.get(ORGANIZING_FLAG_KEY);
+  if (organizing) return;
+
+  const pending = await getPending();
+  if (pending.includes(id)) {
+    await setPending(pending.filter(pendingId => pendingId !== id));
+  }
+});
