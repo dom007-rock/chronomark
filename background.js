@@ -1,7 +1,6 @@
 importScripts("lib/organize.js");
 
 const PENDING_KEY = "pendingBookmarkIds";
-const ORGANIZING_FLAG_KEY = "organizeInProgress";
 
 async function getPending() {
   const data = await chrome.storage.local.get(PENDING_KEY);
@@ -20,8 +19,15 @@ async function setPending(ids) {
 
 // MV3 service workers don't stay alive between events and hold no reliable
 // in-memory state, so the badge has to be rehydrated from storage on wake.
-chrome.runtime.onStartup.addListener(async () => updateBadge((await getPending()).length));
-chrome.runtime.onInstalled.addListener(async () => updateBadge((await getPending()).length));
+// This is also a guaranteed, deterministic point to clear the bulk-operation
+// flag -- no legitimate run can span a browser restart or extension reload,
+// so if it's stuck "active" here, it's stuck, full stop.
+async function onWake() {
+  await endBulkOperation();
+  await updateBadge((await getPending()).length);
+}
+chrome.runtime.onStartup.addListener(onWake);
+chrome.runtime.onInstalled.addListener(onWake);
 
 chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
   if (!bookmark.url) return; // folders don't need filing
@@ -29,8 +35,7 @@ chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
   // While a bulk operation (organize / repair) is running in the popup, its
   // own creates fire this same event hundreds or thousands of times. Skip
   // all of them outright rather than re-checking each one individually.
-  const { [ORGANIZING_FLAG_KEY]: organizing } = await chrome.storage.local.get(ORGANIZING_FLAG_KEY);
-  if (organizing) return;
+  if (await isBulkOperationActive()) return;
 
   // Ignore bookmarks that land inside Organized Bookmarks by some other
   // route too. Read-only lookup -- never creates the folder -- so this
@@ -62,8 +67,7 @@ chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
 // count too -- otherwise the badge keeps showing a bookmark that no longer
 // exists until the next unrelated file/organize click happens to clear it.
 chrome.bookmarks.onRemoved.addListener(async (id) => {
-  const { [ORGANIZING_FLAG_KEY]: organizing } = await chrome.storage.local.get(ORGANIZING_FLAG_KEY);
-  if (organizing) return;
+  if (await isBulkOperationActive()) return;
 
   const pending = await getPending();
   if (pending.includes(id)) {

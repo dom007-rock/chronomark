@@ -5,7 +5,6 @@ const fixDuplicatesBtn = document.getElementById("fixDuplicatesBtn");
 const status = document.getElementById("status");
 
 const PENDING_KEY = "pendingBookmarkIds";
-const ORGANIZING_FLAG_KEY = "organizeInProgress";
 
 async function refreshPendingLine() {
   const data = await chrome.storage.local.get(PENDING_KEY);
@@ -19,18 +18,6 @@ async function refreshPendingLine() {
     fileNewBtn.disabled = false;
   }
   return pending;
-}
-
-// Wraps a bulk bookmark-creating action so background.js's new-bookmark
-// listener ignores every create that happens along the way, instead of
-// treating our own copies as new unfiled bookmarks.
-async function runAsBulkOperation(fn) {
-  await chrome.storage.local.set({ [ORGANIZING_FLAG_KEY]: true });
-  try {
-    return await fn();
-  } finally {
-    await chrome.storage.local.set({ [ORGANIZING_FLAG_KEY]: false });
-  }
 }
 
 fileNewBtn.addEventListener("click", async () => {
