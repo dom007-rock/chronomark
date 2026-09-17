@@ -1,22 +1,5 @@
 importScripts("lib/organize.js");
 
-const PENDING_KEY = "pendingBookmarkIds";
-
-async function getPending() {
-  const data = await chrome.storage.local.get(PENDING_KEY);
-  return data[PENDING_KEY] || [];
-}
-
-async function updateBadge(count) {
-  await chrome.action.setBadgeText({ text: count > 0 ? String(count) : "" });
-  await chrome.action.setBadgeBackgroundColor({ color: "#4f46e5" });
-}
-
-async function setPending(ids) {
-  await chrome.storage.local.set({ [PENDING_KEY]: ids });
-  await updateBadge(ids.length);
-}
-
 // MV3 service workers don't stay alive between events and hold no reliable
 // in-memory state, so the badge has to be rehydrated from storage on wake.
 // This is also a guaranteed, deterministic point to clear the bulk-operation

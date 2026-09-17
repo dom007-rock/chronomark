@@ -16,12 +16,10 @@ getDeleteOriginalsEnabled().then(enabled => {
   deleteOriginalsToggle.checked = enabled;
 });
 
-const PENDING_KEY = "pendingBookmarkIds";
 const MAX_SEARCH_RESULTS = 50;
 
 async function refreshPendingLine() {
-  const data = await chrome.storage.local.get(PENDING_KEY);
-  const pending = data[PENDING_KEY] || [];
+  const pending = await getPending();
   if (pending.length === 0) {
     pendingLine.textContent = "You're all caught up — no new bookmarks waiting.";
     fileNewBtn.disabled = true;
@@ -49,8 +47,7 @@ fileNewBtn.addEventListener("click", async () => {
   }
 
   const result = await runAsBulkOperation(() => organizeBookmarks(nodes));
-  await chrome.storage.local.set({ [PENDING_KEY]: [] });
-  await chrome.action.setBadgeText({ text: "" });
+  await setPending([]);
 
   status.textContent =
     `Filed ${result.filed}, skipped ${result.skipped} already-filed duplicate${result.skipped === 1 ? "" : "s"}.` +
@@ -69,8 +66,7 @@ organizeAllBtn.addEventListener("click", async () => {
   });
 
   // A full sweep covers everything, including whatever was pending.
-  await chrome.storage.local.set({ [PENDING_KEY]: [] });
-  await chrome.action.setBadgeText({ text: "" });
+  await setPending([]);
 
   status.textContent =
     `Done. Filed ${result.filed} bookmarks, skipped ${result.skipped} already-filed duplicates, into "Organized Bookmarks".` +
@@ -208,4 +204,14 @@ async function runSearch() {
   }
 }
 
-refreshPendingLine();
+(async () => {
+  // Safety net: catch anything the background listener might have missed
+  // (see reconcilePending() in lib/organize.js) before showing the count.
+  const caught = await reconcilePending();
+  await refreshPendingLine();
+  if (caught > 0) {
+    status.textContent =
+      `Found ${caught} bookmark${caught === 1 ? "" : "s"} that didn't get picked up ` +
+      `automatically — now ready to file.`;
+  }
+})();
