@@ -6,9 +6,10 @@
 <style>
   body {
     font: 14px/1.4 Arial, sans-serif;
-    width: 300px;
+    width: 320px;
     margin: 0;
     padding: 16px;
+    background: #f0f1f4;
   }
   h1 {
     font-size: 15px;
@@ -42,24 +43,73 @@
     font-size: 11px;
     color: #666;
   }
-  #searchInput {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 6px 8px;
-    margin-top: 8px;
-    font: inherit;
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    padding: 9px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    transition: box-shadow 0.2s ease, background 0.2s ease;
   }
+  .search-bar:focus-within {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  }
+  .search-icon {
+    font-size: 14px;
+    opacity: 0.55;
+    line-height: 1;
+  }
+  #searchInput {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex: 1;
+    font: inherit;
+    font-size: 13px;
+    min-width: 0;
+  }
+  .search-clear {
+    display: none;
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 13px;
+    padding: 0 2px;
+    user-select: none;
+  }
+  .search-clear:hover {
+    opacity: 0.9;
+  }
+  .search-clear.visible {
+    display: block;
+  }
+
   #searchResults {
-    margin-top: 8px;
-    max-height: 280px;
+    display: none;
+    max-height: 340px;
     overflow-y: auto;
+    margin-bottom: 8px;
+    animation: fadeIn 0.15s ease;
+  }
+  #searchResults.visible {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .search-result {
-    padding: 6px 0;
-    border-bottom: 1px solid #eee;
-  }
-  .search-result:last-child {
-    border-bottom: none;
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
   }
   .search-result-title {
     display: block;
@@ -80,7 +130,11 @@
   .search-note {
     font-size: 11px;
     color: #666;
-    margin-top: 6px;
+    padding: 4px 2px;
+  }
+
+  #normalSections.hidden {
+    display: none;
   }
 </style>
 </head>
@@ -88,36 +142,37 @@
 
 <h1>Chronomark</h1>
 
-<div id="pendingLine">Checking for new bookmarks…</div>
-<button id="fileNewBtn" disabled>File new bookmarks</button>
-
-<hr>
-
-<button id="organizeAllBtn">Organize ALL bookmarks now</button>
-<p class="hint">
-  Copies bookmarks into an "Organized Bookmarks" folder (under Other
-  Bookmarks), grouped by Year → Month. Your originals are never moved or
-  deleted.
-</p>
-
-<hr>
-
-<button id="fixDuplicatesBtn">Fix duplicate "Organized Bookmarks" folders</button>
-<p class="hint">
-  One-time repair for a bug that could create more than one "Organized
-  Bookmarks" folder. Merges them into a single folder and removes the
-  empty extras — never touches your original bookmarks.
-</p>
-
-<hr>
-
-<button id="searchToggleBtn">Search bookmarks</button>
-<div id="searchPanel" style="display:none;">
-  <input type="text" id="searchInput" placeholder="Search by title or URL…">
-  <div id="searchResults"></div>
+<div class="search-bar">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="Search bookmarks…" autocomplete="off">
+  <span id="searchClear" class="search-clear">✕</span>
 </div>
+<div id="searchResults"></div>
 
-<div id="status"></div>
+<div id="normalSections">
+  <div id="pendingLine">Checking for new bookmarks…</div>
+  <button id="fileNewBtn" disabled>File new bookmarks</button>
+
+  <hr>
+
+  <button id="organizeAllBtn">Organize ALL bookmarks now</button>
+  <p class="hint">
+    Copies bookmarks into an "Organized Bookmarks" folder (under Other
+    Bookmarks), grouped by Year → Month. Your originals are never moved or
+    deleted.
+  </p>
+
+  <hr>
+
+  <button id="fixDuplicatesBtn">Fix duplicate "Organized Bookmarks" folders</button>
+  <p class="hint">
+    One-time repair for a bug that could create more than one "Organized
+    Bookmarks" folder. Merges them into a single folder and removes the
+    empty extras — never touches your original bookmarks.
+  </p>
+
+  <div id="status"></div>
+</div>
 
 <script src="lib/organize.js"></script>
 <script src="popup.js"></script>

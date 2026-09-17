@@ -3,10 +3,10 @@ const fileNewBtn = document.getElementById("fileNewBtn");
 const organizeAllBtn = document.getElementById("organizeAllBtn");
 const fixDuplicatesBtn = document.getElementById("fixDuplicatesBtn");
 const status = document.getElementById("status");
-const searchToggleBtn = document.getElementById("searchToggleBtn");
-const searchPanel = document.getElementById("searchPanel");
 const searchInput = document.getElementById("searchInput");
+const searchClear = document.getElementById("searchClear");
 const searchResults = document.getElementById("searchResults");
+const normalSections = document.getElementById("normalSections");
 
 const PENDING_KEY = "pendingBookmarkIds";
 const MAX_SEARCH_RESULTS = 50;
@@ -114,11 +114,20 @@ async function getLocationLabel(node) {
   return monthFolder.title || "";
 }
 
-searchToggleBtn.addEventListener("click", () => {
-  const isHidden = searchPanel.style.display === "none";
-  searchPanel.style.display = isHidden ? "block" : "none";
-  searchToggleBtn.textContent = isHidden ? "Hide search" : "Search bookmarks";
-  if (isHidden) searchInput.focus();
+// Two modes: normal (pending/organize/fix-duplicates, the everyday view) and
+// searching (results get the room, everything else steps aside). The search
+// bar itself is always visible either way -- only what's below it changes.
+function setSearchMode(active) {
+  normalSections.classList.toggle("hidden", active);
+  searchResults.classList.toggle("visible", active);
+  searchClear.classList.toggle("visible", active);
+}
+
+searchClear.addEventListener("click", () => {
+  searchInput.value = "";
+  searchInput.focus();
+  setSearchMode(false);
+  searchResults.innerHTML = "";
 });
 
 let searchGeneration = 0;
@@ -134,9 +143,11 @@ async function runSearch() {
   const query = searchInput.value.trim();
 
   if (!query) {
+    setSearchMode(false);
     searchResults.innerHTML = "";
     return;
   }
+  setSearchMode(true);
 
   // Native Chrome API -- matches against both title and URL, across every
   // bookmark (filed or not), not just what's inside Organized Bookmarks.
