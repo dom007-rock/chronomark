@@ -3,8 +3,13 @@ const fileNewBtn = document.getElementById("fileNewBtn");
 const organizeAllBtn = document.getElementById("organizeAllBtn");
 const fixDuplicatesBtn = document.getElementById("fixDuplicatesBtn");
 const status = document.getElementById("status");
+const searchToggleBtn = document.getElementById("searchToggleBtn");
+const searchPanel = document.getElementById("searchPanel");
+const searchInput = document.getElementById("searchInput");
+const searchResults = document.getElementById("searchResults");
 
 const PENDING_KEY = "pendingBookmarkIds";
+const MAX_SEARCH_RESULTS = 50;
 
 async function refreshPendingLine() {
   const data = await chrome.storage.local.get(PENDING_KEY);
@@ -81,5 +86,105 @@ fixDuplicatesBtn.addEventListener("click", async () => {
 
   fixDuplicatesBtn.disabled = false;
 });
+
+// Best-effort human-readable location for a search result: "2024 / June" for
+// something already filed in the organized archive, or just the immediate
+// parent folder's name (e.g. "Bookmarks bar") for anything not yet filed.
+async function getLocationLabel(node) {
+  if (!node.parentId) return "";
+  let monthFolder;
+  try {
+    [monthFolder] = await chrome.bookmarks.get(node.parentId);
+  } catch {
+    return "";
+  }
+  if (!monthFolder?.parentId) return monthFolder?.title || "";
+
+  try {
+    const [yearFolder] = await chrome.bookmarks.get(monthFolder.parentId);
+    if (yearFolder?.parentId) {
+      const [root] = await chrome.bookmarks.get(yearFolder.parentId);
+      if (root?.title === ROOT_FOLDER_TITLE) {
+        return `${yearFolder.title} / ${monthFolder.title}`;
+      }
+    }
+  } catch {
+    // fall through to just the immediate parent below
+  }
+  return monthFolder.title || "";
+}
+
+searchToggleBtn.addEventListener("click", () => {
+  const isHidden = searchPanel.style.display === "none";
+  searchPanel.style.display = isHidden ? "block" : "none";
+  searchToggleBtn.textContent = isHidden ? "Hide search" : "Search bookmarks";
+  if (isHidden) searchInput.focus();
+});
+
+let searchGeneration = 0;
+let searchDebounceTimer = null;
+
+searchInput.addEventListener("input", () => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(runSearch, 150);
+});
+
+async function runSearch() {
+  const myGeneration = ++searchGeneration;
+  const query = searchInput.value.trim();
+
+  if (!query) {
+    searchResults.innerHTML = "";
+    return;
+  }
+
+  // Native Chrome API -- matches against both title and URL, across every
+  // bookmark (filed or not), not just what's inside Organized Bookmarks.
+  const matches = await chrome.bookmarks.search(query);
+  const bookmarksOnly = matches.filter(node => node.url);
+  if (myGeneration !== searchGeneration) return; // a newer keystroke superseded this
+
+  if (bookmarksOnly.length === 0) {
+    searchResults.innerHTML = `<div class="search-note">No matches.</div>`;
+    return;
+  }
+
+  const shown = bookmarksOnly.slice(0, MAX_SEARCH_RESULTS);
+  const rows = [];
+  for (const node of shown) {
+    const location = await getLocationLabel(node);
+    if (myGeneration !== searchGeneration) return; // bail if superseded mid-loop
+    rows.push({ node, location });
+  }
+
+  searchResults.innerHTML = "";
+  for (const { node, location } of rows) {
+    const row = document.createElement("div");
+    row.className = "search-result";
+
+    const link = document.createElement("a");
+    link.className = "search-result-title";
+    link.href = node.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = node.title || node.url;
+
+    const meta = document.createElement("div");
+    meta.className = "search-result-meta";
+    meta.textContent = location ? `${location} — ${node.url}` : node.url;
+
+    row.appendChild(link);
+    row.appendChild(meta);
+    searchResults.appendChild(row);
+  }
+
+  if (bookmarksOnly.length > MAX_SEARCH_RESULTS) {
+    const note = document.createElement("div");
+    note.className = "search-note";
+    note.textContent =
+      `Showing first ${MAX_SEARCH_RESULTS} of ${bookmarksOnly.length} matches — try a more specific search.`;
+    searchResults.appendChild(note);
+  }
+}
 
 refreshPendingLine();

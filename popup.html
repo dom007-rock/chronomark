@@ -42,6 +42,46 @@
     font-size: 11px;
     color: #666;
   }
+  #searchInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    margin-top: 8px;
+    font: inherit;
+  }
+  #searchResults {
+    margin-top: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .search-result {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .search-result:last-child {
+    border-bottom: none;
+  }
+  .search-result-title {
+    display: block;
+    color: #1a0dab;
+    text-decoration: none;
+    font-size: 13px;
+    word-break: break-word;
+  }
+  .search-result-title:hover {
+    text-decoration: underline;
+  }
+  .search-result-meta {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+    word-break: break-all;
+  }
+  .search-note {
+    font-size: 11px;
+    color: #666;
+    margin-top: 6px;
+  }
 </style>
 </head>
 <body>
@@ -68,6 +108,14 @@
   Bookmarks" folder. Merges them into a single folder and removes the
   empty extras — never touches your original bookmarks.
 </p>
+
+<hr>
+
+<button id="searchToggleBtn">Search bookmarks</button>
+<div id="searchPanel" style="display:none;">
+  <input type="text" id="searchInput" placeholder="Search by title or URL…">
+  <div id="searchResults"></div>
+</div>
 
 <div id="status"></div>
 
