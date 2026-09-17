@@ -7,9 +7,14 @@ const searchInput = document.getElementById("searchInput");
 const searchClear = document.getElementById("searchClear");
 const searchResults = document.getElementById("searchResults");
 const normalSections = document.getElementById("normalSections");
-const settingsLink = document.getElementById("settingsLink");
+const deleteOriginalsToggle = document.getElementById("deleteOriginalsToggle");
 
-settingsLink.addEventListener("click", () => chrome.runtime.openOptionsPage());
+deleteOriginalsToggle.addEventListener("change", () => {
+  setDeleteOriginalsEnabled(deleteOriginalsToggle.checked);
+});
+getDeleteOriginalsEnabled().then(enabled => {
+  deleteOriginalsToggle.checked = enabled;
+});
 
 const PENDING_KEY = "pendingBookmarkIds";
 const MAX_SEARCH_RESULTS = 50;

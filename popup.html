@@ -43,17 +43,112 @@
     font-size: 11px;
     color: #666;
   }
-  #settingsLink {
-    display: block;
-    text-align: center;
-    font-size: 11px;
-    color: #888;
-    text-decoration: none;
-    margin-top: 12px;
-    cursor: pointer;
+  .setting-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    padding: 9px 12px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
   }
-  #settingsLink:hover {
-    text-decoration: underline;
+  .setting-label {
+    flex: 1;
+    font-size: 12.5px;
+  }
+  .info-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: #8a8f98;
+    flex-shrink: 0;
+    cursor: default;
+    transition: color 0.15s ease;
+  }
+  .info-icon:hover,
+  .info-icon:focus {
+    color: #4f46e5;
+    outline: none;
+  }
+  .info-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+  .info-tooltip {
+    position: absolute;
+    bottom: 26px;
+    right: -8px;
+    width: 210px;
+    background: #26282e;
+    color: #fff;
+    padding: 9px 11px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .info-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 12px;
+    border: 5px solid transparent;
+    border-top-color: #26282e;
+  }
+  .info-icon:hover .info-tooltip,
+  .info-icon:focus .info-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .switch .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    transition: 0.2s;
+    border-radius: 20px;
+  }
+  .switch .slider::before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+  }
+  .switch input:checked + .slider {
+    background-color: #4f46e5;
+  }
+  .switch input:checked + .slider::before {
+    transform: translateX(14px);
   }
 
   .search-bar {
@@ -162,6 +257,26 @@
 <div id="searchResults"></div>
 
 <div id="normalSections">
+  <div class="setting-row">
+    <span class="setting-label">Delete originals after filing</span>
+    <span class="info-icon" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="11"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span class="info-tooltip">
+        When a bookmark is copied into Organized Bookmarks, this also deletes
+        the original from wherever it was. Off by default — your originals
+        are always kept unless you turn this on.
+      </span>
+    </span>
+    <label class="switch">
+      <input type="checkbox" id="deleteOriginalsToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
   <div id="pendingLine">Checking for new bookmarks…</div>
   <button id="fileNewBtn" disabled>File new bookmarks</button>
 
@@ -171,7 +286,7 @@
   <p class="hint">
     Copies bookmarks into an "Organized Bookmarks" folder (under Other
     Bookmarks), grouped by Year → Month. Your originals are kept as-is
-    unless you've turned on "Delete originals after filing" in Settings.
+    unless you've turned on "Delete originals after filing" above.
   </p>
 
   <hr>
@@ -184,7 +299,6 @@
   </p>
 
   <div id="status"></div>
-  <a id="settingsLink">⚙ Settings</a>
 </div>
 
 <script src="lib/organize.js"></script>
