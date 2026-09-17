@@ -43,6 +43,18 @@
     font-size: 11px;
     color: #666;
   }
+  #settingsLink {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    text-decoration: none;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+  #settingsLink:hover {
+    text-decoration: underline;
+  }
 
   .search-bar {
     display: flex;
@@ -158,8 +170,8 @@
   <button id="organizeAllBtn">Organize ALL bookmarks now</button>
   <p class="hint">
     Copies bookmarks into an "Organized Bookmarks" folder (under Other
-    Bookmarks), grouped by Year → Month. Your originals are never moved or
-    deleted.
+    Bookmarks), grouped by Year → Month. Your originals are kept as-is
+    unless you've turned on "Delete originals after filing" in Settings.
   </p>
 
   <hr>
@@ -172,6 +184,7 @@
   </p>
 
   <div id="status"></div>
+  <a id="settingsLink">⚙ Settings</a>
 </div>
 
 <script src="lib/organize.js"></script>

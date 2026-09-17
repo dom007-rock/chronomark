@@ -7,6 +7,9 @@ const searchInput = document.getElementById("searchInput");
 const searchClear = document.getElementById("searchClear");
 const searchResults = document.getElementById("searchResults");
 const normalSections = document.getElementById("normalSections");
+const settingsLink = document.getElementById("settingsLink");
+
+settingsLink.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
 const PENDING_KEY = "pendingBookmarkIds";
 const MAX_SEARCH_RESULTS = 50;
@@ -45,7 +48,8 @@ fileNewBtn.addEventListener("click", async () => {
   await chrome.action.setBadgeText({ text: "" });
 
   status.textContent =
-    `Filed ${result.filed}, skipped ${result.skipped} already-filed duplicate${result.skipped === 1 ? "" : "s"}.`;
+    `Filed ${result.filed}, skipped ${result.skipped} already-filed duplicate${result.skipped === 1 ? "" : "s"}.` +
+    (result.originalsDeleted ? ` Deleted ${result.originalsDeleted} original${result.originalsDeleted === 1 ? "" : "s"}.` : "");
   await refreshPendingLine();
 });
 
@@ -64,7 +68,8 @@ organizeAllBtn.addEventListener("click", async () => {
   await chrome.action.setBadgeText({ text: "" });
 
   status.textContent =
-    `Done. Filed ${result.filed} bookmarks, skipped ${result.skipped} already-filed duplicates, into "Organized Bookmarks".`;
+    `Done. Filed ${result.filed} bookmarks, skipped ${result.skipped} already-filed duplicates, into "Organized Bookmarks".` +
+    (result.originalsDeleted ? ` Deleted ${result.originalsDeleted} original${result.originalsDeleted === 1 ? "" : "s"}.` : "");
   organizeAllBtn.disabled = false;
   await refreshPendingLine();
 });

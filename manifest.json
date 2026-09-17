@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Files your bookmarks into Year / Month folders without touching your originals.",
   "permissions": ["bookmarks", "storage"],
+  "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
   },
