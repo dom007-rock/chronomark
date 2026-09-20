@@ -24,20 +24,7 @@ chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
   // route too. Read-only lookup -- never creates the folder -- so this
   // listener can't itself cause the duplicate-folder bug.
   const root = await findOrganizedRoot();
-  if (root) {
-    let parentId = bookmark.parentId;
-    const visited = new Set();
-    while (parentId && !visited.has(parentId)) {
-      if (parentId === root.id) return;
-      visited.add(parentId);
-      try {
-        const [node] = await chrome.bookmarks.get(parentId);
-        parentId = node.parentId;
-      } catch {
-        break;
-      }
-    }
-  }
+  if (root && await isDescendantOfFolder(bookmark.parentId, root.id)) return;
 
   const pending = await getPending();
   if (!pending.includes(id)) {
@@ -55,5 +42,38 @@ chrome.bookmarks.onRemoved.addListener(async (id) => {
   const pending = await getPending();
   if (pending.includes(id)) {
     await setPending(pending.filter(pendingId => pendingId !== id));
+  }
+});
+
+// A bookmark dragged out of Organized Bookmarks is unfiled again and needs
+// picking up; one dragged INTO it should be treated as already filed. Moves
+// that don't cross that boundary (e.g. reshuffling within the Bookmarks Bar,
+// or between Year/Month folders) don't change filed status either way.
+chrome.bookmarks.onMoved.addListener(async (id, moveInfo) => {
+  if (await isBulkOperationActive()) return;
+
+  const root = await findOrganizedRoot();
+  if (!root) return;
+
+  const wasInside = await isDescendantOfFolder(moveInfo.oldParentId, root.id);
+  const isInside = await isDescendantOfFolder(moveInfo.parentId, root.id);
+  if (wasInside === isInside) return; // didn't cross the boundary
+
+  let bookmark;
+  try {
+    [bookmark] = await chrome.bookmarks.get(id);
+  } catch {
+    return;
+  }
+  if (!bookmark || !bookmark.url) return; // folders don't need filing
+
+  const pending = await getPending();
+  if (isInside) {
+    if (pending.includes(id)) {
+      await setPending(pending.filter(pendingId => pendingId !== id));
+    }
+  } else if (!pending.includes(id)) {
+    pending.push(id);
+    await setPending(pending);
   }
 });
