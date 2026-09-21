@@ -243,6 +243,29 @@
   #normalSections.hidden {
     display: none;
   }
+
+  #duplicatesBtn {
+    display: none;
+    background: #fff7e6;
+    border: 1px solid #f0d999;
+    color: #8a6100;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 12.5px;
+  }
+  #duplicatesBtn.visible {
+    display: block;
+  }
+  #duplicatesResults {
+    display: none;
+    max-height: 340px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    animation: fadeIn 0.15s ease;
+  }
+  #duplicatesResults.visible {
+    display: block;
+  }
 </style>
 </head>
 <body>
@@ -255,6 +278,9 @@
   <span id="searchClear" class="search-clear">✕</span>
 </div>
 <div id="searchResults"></div>
+
+<button id="duplicatesBtn"></button>
+<div id="duplicatesResults"></div>
 
 <div id="normalSections">
   <div class="setting-row">

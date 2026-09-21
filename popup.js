@@ -8,6 +8,8 @@ const searchClear = document.getElementById("searchClear");
 const searchResults = document.getElementById("searchResults");
 const normalSections = document.getElementById("normalSections");
 const deleteOriginalsToggle = document.getElementById("deleteOriginalsToggle");
+const duplicatesBtn = document.getElementById("duplicatesBtn");
+const duplicatesResults = document.getElementById("duplicatesResults");
 
 deleteOriginalsToggle.addEventListener("change", () => {
   setDeleteOriginalsEnabled(deleteOriginalsToggle.checked);
@@ -120,6 +122,53 @@ async function getLocationLabel(node) {
   return monthFolder.title || "";
 }
 
+let duplicateGroups = [];
+
+// Hidden until findDuplicateGroups() (run once at startup, below) actually
+// finds something. Clicking toggles the list open/closed -- the groups
+// themselves were already computed at startup, so this is just rendering.
+duplicatesBtn.addEventListener("click", async () => {
+  const isHidden = !duplicatesResults.classList.contains("visible");
+  if (!isHidden) {
+    duplicatesResults.classList.remove("visible");
+    duplicatesResults.innerHTML = "";
+    return;
+  }
+
+  duplicatesResults.innerHTML = "";
+  const shown = duplicateGroups.slice(0, MAX_SEARCH_RESULTS);
+  for (const group of shown) {
+    const groupEl = document.createElement("div");
+    groupEl.className = "search-result";
+
+    const title = document.createElement("a");
+    title.className = "search-result-title";
+    title.href = group[0].url;
+    title.target = "_blank";
+    title.rel = "noopener noreferrer";
+    title.textContent = group[0].title || group[0].url;
+    groupEl.appendChild(title);
+
+    for (const node of group) {
+      const location = await getLocationLabel(node);
+      const meta = document.createElement("div");
+      meta.className = "search-result-meta";
+      meta.textContent = location ? `${location} — ${node.url}` : node.url;
+      groupEl.appendChild(meta);
+    }
+
+    duplicatesResults.appendChild(groupEl);
+  }
+  if (duplicateGroups.length > MAX_SEARCH_RESULTS) {
+    const note = document.createElement("div");
+    note.className = "search-note";
+    note.textContent =
+      `Showing first ${MAX_SEARCH_RESULTS} of ${duplicateGroups.length} duplicate URLs.`;
+    duplicatesResults.appendChild(note);
+  }
+  duplicatesResults.classList.add("visible");
+});
+
 // Two modes: normal (pending/organize/fix-duplicates, the everyday view) and
 // searching (results get the room, everything else steps aside). The search
 // bar itself is always visible either way -- only what's below it changes.
@@ -211,6 +260,16 @@ async function runSearch() {
   const caught = await reconcilePending();
   const corrected = await reconcilePlacement();
   await refreshPendingLine();
+
+  // Silent, read-only duplicate scan -- runs once here, not from a live
+  // listener. Stays completely invisible unless it actually finds something.
+  duplicateGroups = await findDuplicateGroups();
+  if (duplicateGroups.length > 0) {
+    duplicatesBtn.textContent =
+      `Found ${duplicateGroups.length} bookmarked URL${duplicateGroups.length === 1 ? "" : "s"} ` +
+      `saved more than once — click to view`;
+    duplicatesBtn.classList.add("visible");
+  }
 
   const notes = [];
   if (caught > 0) {
