@@ -2,6 +2,7 @@ const pendingLine = document.getElementById("pendingLine");
 const fileNewBtn = document.getElementById("fileNewBtn");
 const organizeAllBtn = document.getElementById("organizeAllBtn");
 const fixDuplicatesBtn = document.getElementById("fixDuplicatesBtn");
+const fixMisplacedBtn = document.getElementById("fixMisplacedBtn");
 const status = document.getElementById("status");
 const searchInput = document.getElementById("searchInput");
 const searchClear = document.getElementById("searchClear");
@@ -91,6 +92,19 @@ fixDuplicatesBtn.addEventListener("click", async () => {
   }
 
   fixDuplicatesBtn.disabled = false;
+});
+
+fixMisplacedBtn.addEventListener("click", async () => {
+  fixMisplacedBtn.disabled = true;
+  status.textContent = "Checking for misplaced bookmarks…";
+
+  const result = await runAsBulkOperation(() => repairMisplacedBookmarks());
+
+  status.textContent = result.moved === 0
+    ? "Nothing misplaced — everything's already in its correct Year/Month folder."
+    : `Moved ${result.moved} bookmark${result.moved === 1 ? "" : "s"} into the correct Year/Month folder.`;
+
+  fixMisplacedBtn.disabled = false;
 });
 
 // Best-effort human-readable location for a search result: "2024 / June" for
