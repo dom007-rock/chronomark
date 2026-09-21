@@ -205,13 +205,21 @@ async function runSearch() {
 }
 
 (async () => {
-  // Safety net: catch anything the background listener might have missed
-  // (see reconcilePending() in lib/organize.js) before showing the count.
+  // Safety net: catch anything the background listeners might have missed
+  // (see reconcilePending() / reconcilePlacement() in lib/organize.js)
+  // before showing the count.
   const caught = await reconcilePending();
+  const corrected = await reconcilePlacement();
   await refreshPendingLine();
+
+  const notes = [];
   if (caught > 0) {
-    status.textContent =
-      `Found ${caught} bookmark${caught === 1 ? "" : "s"} that didn't get picked up ` +
-      `automatically — now ready to file.`;
+    notes.push(`Found ${caught} bookmark${caught === 1 ? "" : "s"} that didn't get picked up automatically — now ready to file.`);
+  }
+  if (corrected > 0) {
+    notes.push(`Corrected ${corrected} misplaced bookmark${corrected === 1 ? "" : "s"} into the right Year/Month folder.`);
+  }
+  if (notes.length > 0) {
+    status.textContent = notes.join(" ");
   }
 })();
