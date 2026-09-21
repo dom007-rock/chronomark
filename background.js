@@ -20,11 +20,14 @@ chrome.bookmarks.onCreated.addListener(async (id, bookmark) => {
   // all of them outright rather than re-checking each one individually.
   if (await isBulkOperationActive()) return;
 
-  // Ignore bookmarks that land inside Organized Bookmarks by some other
-  // route too. Read-only lookup -- never creates the folder -- so this
-  // listener can't itself cause the duplicate-folder bug.
+  // A bookmark that lands inside Organized Bookmarks by some other route
+  // (Chrome defaulting the save dialog to a folder in the archive) doesn't
+  // need filing, but might need correcting into the right Year/Month.
   const root = await findOrganizedRoot();
-  if (root && await isDescendantOfFolder(bookmark.parentId, root.id)) return;
+  if (root && await isDescendantOfFolder(bookmark.parentId, root.id)) {
+    await fixPlacementIfNeeded(bookmark, root);
+    return;
+  }
 
   const pending = await getPending();
   if (!pending.includes(id)) {
@@ -72,6 +75,7 @@ chrome.bookmarks.onMoved.addListener(async (id, moveInfo) => {
     if (pending.includes(id)) {
       await setPending(pending.filter(pendingId => pendingId !== id));
     }
+    await fixPlacementIfNeeded(bookmark, root);
   } else if (!pending.includes(id)) {
     pending.push(id);
     await setPending(pending);
