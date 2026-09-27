@@ -1,36 +1,56 @@
-"""Generates placeholder toolbar icons (16/48/128px) with no dependencies
-beyond the standard library. Swap these for real branding whenever -- this
-just draws a flat-color square with a simple bookmark-ribbon notch so the
-extension has *something* to show in chrome://extensions.
+"""Generates toolbar icons (16/48/128px) with no dependencies beyond the
+standard library. A rounded-square indigo background (matching the popup's
+own accent color) with a simple bookmark ribbon -- kept deliberately plain
+since a clock-hands accent tried here didn't read cleanly at small sizes
+(looked like a stray mark rather than a clock once shrunk to 16px).
 """
 import os
 import struct
 import zlib
 
-BG = (51, 65, 85)       # slate-700ish placeholder background
+BG = (79, 70, 229)      # indigo-600, matches the popup's own accent color
 FG = (248, 250, 252)    # near-white ribbon
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "icons")
 
 
-def pixel(x, y, w, h):
-    rx0, rx1 = int(w * 0.28), int(w * 0.72)
-    ry0, ry1 = int(h * 0.16), int(h * 0.86)
+def in_rounded_rect(px, py, w, h, radius):
+    corners = [
+        (radius, radius, px < radius, py < radius),
+        (w - radius, radius, px > w - radius, py < radius),
+        (radius, h - radius, px < radius, py > h - radius),
+        (w - radius, h - radius, px > w - radius, py > h - radius),
+    ]
+    for cx, cy, in_x, in_y in corners:
+        if in_x and in_y:
+            return (px - cx) ** 2 + (py - cy) ** 2 <= radius ** 2
+    return True
+
+
+def ribbon(x, y, w, h):
+    rx0, rx1 = w * 0.26, w * 0.68
+    ry0, ry1 = h * 0.14, h * 0.84
     if not (rx0 <= x < rx1 and ry0 <= y < ry1):
-        return BG
+        return False
 
     notch_h = (ry1 - ry0) * 0.45
     notch_start = ry1 - notch_h
     if y < notch_start:
-        return FG
+        return True
 
     t = (y - notch_start) / notch_h
     half_w = (rx1 - rx0) / 2
     cx = (rx0 + rx1) / 2
     excluded_half = half_w * t
-    if abs((x + 0.5) - cx) <= excluded_half:
-        return BG
-    return FG
+    return abs((x + 0.5) - cx) > excluded_half
+
+
+def pixel(x, y, w, h):
+    px, py = x + 0.5, y + 0.5
+    if not in_rounded_rect(px, py, w, h, w * 0.22):
+        return (*BG, 0)  # transparent outside the rounded square
+
+    return (*(FG if ribbon(x, y, w, h) else BG), 255)
 
 
 def make_png(path, size):
@@ -39,8 +59,8 @@ def make_png(path, size):
     for y in range(h):
         row = bytearray([0])  # filter byte: none
         for x in range(w):
-            r, g, b = pixel(x, y, w, h)
-            row += bytes([r, g, b, 255])
+            r, g, b, a = pixel(x, y, w, h)
+            row += bytes([r, g, b, a])
         rows.append(bytes(row))
     raw = b"".join(rows)
     compressed = zlib.compress(raw, 9)
