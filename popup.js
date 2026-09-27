@@ -10,12 +10,20 @@ const normalSections = document.getElementById("normalSections");
 const deleteOriginalsToggle = document.getElementById("deleteOriginalsToggle");
 const duplicatesBtn = document.getElementById("duplicatesBtn");
 const duplicatesResults = document.getElementById("duplicatesResults");
+const autoCleanDuplicatesToggle = document.getElementById("autoCleanDuplicatesToggle");
 
 deleteOriginalsToggle.addEventListener("change", () => {
   setDeleteOriginalsEnabled(deleteOriginalsToggle.checked);
 });
 getDeleteOriginalsEnabled().then(enabled => {
   deleteOriginalsToggle.checked = enabled;
+});
+
+autoCleanDuplicatesToggle.addEventListener("change", () => {
+  setAutoCleanDuplicatesEnabled(autoCleanDuplicatesToggle.checked);
+});
+getAutoCleanDuplicatesEnabled().then(enabled => {
+  autoCleanDuplicatesToggle.checked = enabled;
 });
 
 const MAX_SEARCH_RESULTS = 50;
@@ -284,14 +292,22 @@ async function renderMoreSearchResults(myGeneration) {
   const corrected = await reconcilePlacement();
   await refreshPendingLine();
 
-  // Silent, read-only duplicate scan -- runs once here, not from a live
-  // listener. Stays completely invisible unless it actually finds something.
-  duplicateGroups = await findDuplicateGroups();
-  if (duplicateGroups.length > 0) {
-    duplicatesBtn.textContent =
-      `Found ${duplicateGroups.length} bookmarked URL${duplicateGroups.length === 1 ? "" : "s"} ` +
-      `saved more than once — click to view`;
-    duplicatesBtn.classList.add("visible");
+  // Silent scan -- runs once here, not from a live listener. Either reports
+  // (default) or, if the auto-clean toggle is on, resolves everything in
+  // one shot with no per-group review.
+  const foundGroups = await findDuplicateGroups();
+  const autoClean = await getAutoCleanDuplicatesEnabled();
+  let cleaned = 0;
+  if (autoClean && foundGroups.length > 0) {
+    cleaned = await cleanupDuplicateGroups(foundGroups);
+  } else {
+    duplicateGroups = foundGroups;
+    if (duplicateGroups.length > 0) {
+      duplicatesBtn.textContent =
+        `Found ${duplicateGroups.length} bookmarked URL${duplicateGroups.length === 1 ? "" : "s"} ` +
+        `saved more than once — click to view`;
+      duplicatesBtn.classList.add("visible");
+    }
   }
 
   const notes = [];
@@ -300,6 +316,9 @@ async function renderMoreSearchResults(myGeneration) {
   }
   if (corrected > 0) {
     notes.push(`Corrected ${corrected} misplaced bookmark${corrected === 1 ? "" : "s"} into the right Year/Month folder.`);
+  }
+  if (cleaned > 0) {
+    notes.push(`Cleaned up ${cleaned} duplicate bookmark${cleaned === 1 ? "" : "s"}, kept the most recent copy of each.`);
   }
   if (notes.length > 0) {
     status.textContent = notes.join(" ");
