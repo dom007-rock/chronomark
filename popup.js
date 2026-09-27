@@ -300,13 +300,23 @@ async function renderMoreSearchResults(myGeneration) {
   let cleaned = 0;
   if (autoClean && foundGroups.length > 0) {
     cleaned = await cleanupDuplicateGroups(foundGroups);
+    await setKnownDuplicateUrls(new Set()); // just resolved -- nothing left to remember
   } else {
     duplicateGroups = foundGroups;
     if (duplicateGroups.length > 0) {
-      duplicatesBtn.textContent =
-        `Found ${duplicateGroups.length} bookmarked URL${duplicateGroups.length === 1 ? "" : "s"} ` +
-        `saved more than once — click to view`;
+      // Compare against what was already known as of the last popup-open,
+      // so a repeat visit doesn't re-announce the exact same list -- only
+      // genuinely new duplicates get called out specifically.
+      const knownUrls = await getKnownDuplicateUrls();
+      const newGroups = duplicateGroups.filter(g => !knownUrls.has(g[0].url));
+      await setKnownDuplicateUrls(new Set(duplicateGroups.map(g => g[0].url)));
+
+      duplicatesBtn.textContent = (newGroups.length > 0 && newGroups.length < duplicateGroups.length)
+        ? `Found ${newGroups.length} new duplicate URL${newGroups.length === 1 ? "" : "s"} (${duplicateGroups.length} total) — click to view`
+        : `Found ${duplicateGroups.length} bookmarked URL${duplicateGroups.length === 1 ? "" : "s"} saved more than once — click to view`;
       duplicatesBtn.classList.add("visible");
+    } else {
+      await setKnownDuplicateUrls(new Set());
     }
   }
 
