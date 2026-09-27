@@ -122,7 +122,19 @@ async function getLocationLabel(node) {
   return monthFolder.title || "";
 }
 
+// Shared "load N more (M remaining)" button used by both the search results
+// and the duplicates list, so neither is stuck at a hard 50-item ceiling.
+function makeLoadMoreButton(container, totalCount, shownCount, onClick) {
+  const remaining = totalCount - shownCount;
+  const btn = document.createElement("button");
+  btn.className = "load-more-btn";
+  btn.textContent = `Show ${Math.min(MAX_SEARCH_RESULTS, remaining)} more (${remaining} remaining)`;
+  btn.addEventListener("click", onClick);
+  container.appendChild(btn);
+}
+
 let duplicateGroups = [];
+let duplicatesShownCount = 0;
 
 // Hidden until findDuplicateGroups() (run once at startup, below) actually
 // finds something. Clicking toggles the list open/closed -- the groups
@@ -136,8 +148,17 @@ duplicatesBtn.addEventListener("click", async () => {
   }
 
   duplicatesResults.innerHTML = "";
-  const shown = duplicateGroups.slice(0, MAX_SEARCH_RESULTS);
-  for (const group of shown) {
+  duplicatesShownCount = 0;
+  await renderMoreDuplicates();
+  duplicatesResults.classList.add("visible");
+});
+
+async function renderMoreDuplicates() {
+  const existingBtn = duplicatesResults.querySelector(".load-more-btn");
+  if (existingBtn) existingBtn.remove();
+
+  const nextBatch = duplicateGroups.slice(duplicatesShownCount, duplicatesShownCount + MAX_SEARCH_RESULTS);
+  for (const group of nextBatch) {
     const groupEl = document.createElement("div");
     groupEl.className = "search-result";
 
@@ -159,15 +180,12 @@ duplicatesBtn.addEventListener("click", async () => {
 
     duplicatesResults.appendChild(groupEl);
   }
-  if (duplicateGroups.length > MAX_SEARCH_RESULTS) {
-    const note = document.createElement("div");
-    note.className = "search-note";
-    note.textContent =
-      `Showing first ${MAX_SEARCH_RESULTS} of ${duplicateGroups.length} duplicate URLs.`;
-    duplicatesResults.appendChild(note);
+  duplicatesShownCount += nextBatch.length;
+
+  if (duplicatesShownCount < duplicateGroups.length) {
+    makeLoadMoreButton(duplicatesResults, duplicateGroups.length, duplicatesShownCount, renderMoreDuplicates);
   }
-  duplicatesResults.classList.add("visible");
-});
+}
 
 // Two modes: normal (pending/organize/fix-duplicates, the everyday view) and
 // searching (results get the room, everything else steps aside). The search
@@ -187,6 +205,8 @@ searchClear.addEventListener("click", () => {
 
 let searchGeneration = 0;
 let searchDebounceTimer = null;
+let currentSearchMatches = [];
+let searchShownCount = 0;
 
 searchInput.addEventListener("input", () => {
   clearTimeout(searchDebounceTimer);
@@ -210,21 +230,27 @@ async function runSearch() {
   const bookmarksOnly = matches.filter(node => node.url);
   if (myGeneration !== searchGeneration) return; // a newer keystroke superseded this
 
+  currentSearchMatches = bookmarksOnly;
+  searchShownCount = 0;
+  searchResults.innerHTML = "";
+
   if (bookmarksOnly.length === 0) {
     searchResults.innerHTML = `<div class="search-note">No matches.</div>`;
     return;
   }
 
-  const shown = bookmarksOnly.slice(0, MAX_SEARCH_RESULTS);
-  const rows = [];
-  for (const node of shown) {
+  await renderMoreSearchResults(myGeneration);
+}
+
+async function renderMoreSearchResults(myGeneration) {
+  const existingBtn = searchResults.querySelector(".load-more-btn");
+  if (existingBtn) existingBtn.remove();
+
+  const nextBatch = currentSearchMatches.slice(searchShownCount, searchShownCount + MAX_SEARCH_RESULTS);
+  for (const node of nextBatch) {
     const location = await getLocationLabel(node);
     if (myGeneration !== searchGeneration) return; // bail if superseded mid-loop
-    rows.push({ node, location });
-  }
 
-  searchResults.innerHTML = "";
-  for (const { node, location } of rows) {
     const row = document.createElement("div");
     row.className = "search-result";
 
@@ -243,13 +269,10 @@ async function runSearch() {
     row.appendChild(meta);
     searchResults.appendChild(row);
   }
+  searchShownCount += nextBatch.length;
 
-  if (bookmarksOnly.length > MAX_SEARCH_RESULTS) {
-    const note = document.createElement("div");
-    note.className = "search-note";
-    note.textContent =
-      `Showing first ${MAX_SEARCH_RESULTS} of ${bookmarksOnly.length} matches — try a more specific search.`;
-    searchResults.appendChild(note);
+  if (searchShownCount < currentSearchMatches.length) {
+    makeLoadMoreButton(searchResults, currentSearchMatches.length, searchShownCount, () => renderMoreSearchResults(searchGeneration));
   }
 }
 
