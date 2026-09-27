@@ -301,6 +301,10 @@ async function renderMoreSearchResults(myGeneration) {
   if (autoClean && foundGroups.length > 0) {
     cleaned = await cleanupDuplicateGroups(foundGroups);
     await setKnownDuplicateUrls(new Set()); // just resolved -- nothing left to remember
+    // One-shot by design: turn itself back off after running, rather than
+    // silently staying "armed" to auto-delete anything new indefinitely.
+    await setAutoCleanDuplicatesEnabled(false);
+    autoCleanDuplicatesToggle.checked = false;
   } else {
     duplicateGroups = foundGroups;
     if (duplicateGroups.length > 0) {
