@@ -28,8 +28,13 @@ def in_rounded_rect(px, py, w, h, radius):
 
 
 def ribbon(x, y, w, h):
-    rx0, rx1 = w * 0.26, w * 0.68
-    ry0, ry1 = h * 0.14, h * 0.84
+    # Shifted up and shrunk vertically (was 0.14-0.84h, centered) so the
+    # recognizable shape sits in the top ~60% of the icon -- Chrome renders
+    # the toolbar badge bottom-anchored, so leaving that area clear of any
+    # meaningful shape (rather than centered through it) keeps the icon
+    # readable even with a count badge sitting on top of it.
+    rx0, rx1 = w * 0.28, w * 0.66
+    ry0, ry1 = h * 0.10, h * 0.60
     if not (rx0 <= x < rx1 and ry0 <= y < ry1):
         return False
 
