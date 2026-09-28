@@ -44,10 +44,12 @@ async function refreshPendingLine() {
   if (pending.length === 0) {
     pendingLine.textContent = "You're all caught up — no new bookmarks waiting.";
     fileNewBtn.disabled = true;
+    organizeAllBtn.classList.remove("visible");
   } else {
     pendingLine.textContent =
       `${pending.length} new bookmark${pending.length === 1 ? "" : "s"} ready to file.`;
     fileNewBtn.disabled = false;
+    organizeAllBtn.classList.add("visible");
   }
   return pending;
 }
