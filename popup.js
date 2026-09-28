@@ -109,6 +109,7 @@ fixDuplicatesBtn.addEventListener("click", async () => {
       `Merged ${result.merged} bookmark${result.merged === 1 ? "" : "s"} and removed ` +
       `${result.duplicatesRemoved} duplicate folder${result.duplicatesRemoved === 1 ? "" : "s"}. ` +
       `Everything now lives in one "Organized Bookmarks" folder.`;
+    fixDuplicatesBtn.classList.remove("visible");
   }
 
   fixDuplicatesBtn.disabled = false;
@@ -302,6 +303,14 @@ async function renderMoreSearchResults(myGeneration) {
   const caught = await reconcilePending();
   const corrected = await reconcilePlacement();
   await refreshPendingLine();
+
+  // Same "stay hidden unless actually relevant" treatment as duplicatesBtn
+  // below -- most end users will never have more than one root folder, so
+  // don't show a permanent repair tool for a problem they don't have.
+  const rootFolders = await findAllOrganizedRootFolders();
+  if (rootFolders.length > 1) {
+    fixDuplicatesBtn.classList.add("visible");
+  }
 
   // Silent scan -- runs once here, not from a live listener. Either reports
   // (default) or, if the auto-clean toggle is on, resolves everything in
