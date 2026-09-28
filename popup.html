@@ -72,9 +72,14 @@
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     margin: 16px 0;
   }
-  .hint {
-    font-size: 11px;
-    color: #666;
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .action-row button {
+    flex: 1;
+    min-width: 0;
   }
   .setting-row {
     display: flex;
@@ -372,21 +377,39 @@
 
   <hr>
 
-  <button id="organizeAllBtn">Organize ALL bookmarks now</button>
-  <p class="hint">
-    Copies bookmarks into an "Organized Bookmarks" folder (under Other
-    Bookmarks), grouped by Year → Month. Your originals are kept as-is
-    unless you've turned on "Delete originals after filing" above.
-  </p>
+  <div class="action-row">
+    <button id="organizeAllBtn">Organize ALL bookmarks now</button>
+    <span class="info-icon" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="11"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span class="info-tooltip">
+        Copies bookmarks into an "Organized Bookmarks" folder (under Other
+        Bookmarks), grouped by Year → Month. Your originals are kept as-is
+        unless you've turned on "Delete originals after filing" above.
+      </span>
+    </span>
+  </div>
 
   <hr>
 
-  <button id="fixDuplicatesBtn">Fix duplicate "Organized Bookmarks" folders</button>
-  <p class="hint">
-    One-time repair for a bug that could create more than one "Organized
-    Bookmarks" folder. Merges them into a single folder and removes the
-    empty extras — never touches your original bookmarks.
-  </p>
+  <div class="action-row">
+    <button id="fixDuplicatesBtn">Fix duplicate "Organized Bookmarks" folders</button>
+    <span class="info-icon" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="11"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span class="info-tooltip">
+        One-time repair for a bug that could create more than one
+        "Organized Bookmarks" folder. Merges them into a single folder and
+        removes the empty extras — never touches your original bookmarks.
+      </span>
+    </span>
+  </div>
 
   <div id="status"></div>
 </div>
