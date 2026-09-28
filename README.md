@@ -63,4 +63,4 @@ Not yet on the Chrome Web Store.
 
 ## License
 
-MIT (or pick whatever license you'd rather use before publishing)
+MIT — see [LICENSE](LICENSE).
