@@ -75,10 +75,17 @@
     margin-top: 8px;
     min-height: 1em;
   }
+  #status:empty {
+    display: none;
+  }
   hr {
     border: none;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     margin: 10px 0;
+  }
+  hr:has(+ #organizeAllBtn:not(.visible)),
+  hr:has(+ #fixDuplicatesBtn:not(.visible)) {
+    display: none;
   }
   .btn-with-info {
     display: flex;
