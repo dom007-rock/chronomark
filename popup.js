@@ -12,6 +12,17 @@ const duplicatesBtn = document.getElementById("duplicatesBtn");
 const duplicatesResults = document.getElementById("duplicatesResults");
 const autoCleanDuplicatesToggle = document.getElementById("autoCleanDuplicatesToggle");
 
+// The info icons for these two buttons live INSIDE the <button> now (full
+// width, icon embedded) rather than as a separate sibling element. A click
+// on the icon would otherwise bubble up and fire the button's own action --
+// stop it there so hovering/clicking the icon only ever shows the tooltip.
+for (const id of ["organizeAllInfo", "fixDuplicatesInfo"]) {
+  document.getElementById(id).addEventListener("click", (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+  });
+}
+
 deleteOriginalsToggle.addEventListener("change", () => {
   setDeleteOriginalsEnabled(deleteOriginalsToggle.checked);
 });

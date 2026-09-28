@@ -72,14 +72,15 @@
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     margin: 16px 0;
   }
-  .action-row {
+  .btn-with-info {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
+    text-align: left;
   }
-  .action-row button {
-    flex: 1;
-    min-width: 0;
+  .btn-with-info .info-icon {
+    cursor: pointer;
   }
   .setting-row {
     display: flex;
@@ -377,9 +378,9 @@
 
   <hr>
 
-  <div class="action-row">
-    <button id="organizeAllBtn">Organize ALL bookmarks now</button>
-    <span class="info-icon" tabindex="0">
+  <button id="organizeAllBtn" class="btn-with-info">
+    <span>Organize ALL bookmarks now</span>
+    <span class="info-icon" id="organizeAllInfo" tabindex="0">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="16" x2="12" y2="11"></line>
@@ -391,13 +392,13 @@
         unless you've turned on "Delete originals after filing" above.
       </span>
     </span>
-  </div>
+  </button>
 
   <hr>
 
-  <div class="action-row">
-    <button id="fixDuplicatesBtn">Fix duplicate "Organized Bookmarks" folders</button>
-    <span class="info-icon" tabindex="0">
+  <button id="fixDuplicatesBtn" class="btn-with-info">
+    <span>Fix duplicate "Organized Bookmarks" folders</span>
+    <span class="info-icon" id="fixDuplicatesInfo" tabindex="0">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="16" x2="12" y2="11"></line>
@@ -409,7 +410,7 @@
         removes the empty extras — never touches your original bookmarks.
       </span>
     </span>
-  </div>
+  </button>
 
   <div id="status"></div>
 </div>
