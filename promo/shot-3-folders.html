@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 800px;
+    background: #e2e5ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+  }
+  .browser {
+    width: 1180px;
+    height: 720px;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+  }
+  .browser-top {
+    height: 52px;
+    background: #eceef2;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    border-bottom: 1px solid #dcdfe4;
+    flex-shrink: 0;
+  }
+  .dots { display: flex; gap: 8px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+  .addr {
+    flex: 1;
+    max-width: 480px;
+    height: 30px;
+    background: #fff;
+    border-radius: 15px;
+    border: 1px solid #dcdfe4;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: #6b7280;
+    font-size: 13px;
+  }
+  .browser-body {
+    position: relative;
+    flex: 1;
+    background: #fff;
+    padding: 32px 48px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  .bm-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #26282e;
+    margin: 0 0 20px;
+  }
+  .tree { color: #3c3f44; }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+  }
+  .folder-icon {
+    width: 18px; height: 18px; flex-shrink: 0;
+  }
+  .bookmark-icon {
+    width: 14px; height: 14px; flex-shrink: 0; opacity: 0.45;
+  }
+  .indent1 { margin-left: 28px; }
+  .indent2 { margin-left: 56px; }
+  .indent3 { margin-left: 84px; font-size: 13px; color: #55585e; }
+  .row.active { background: #eef0fd; border-radius: 8px; }
+</style>
+</head>
+<body>
+  <div class="browser">
+    <div class="browser-top">
+      <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      <div class="addr">chrome://bookmarks</div>
+    </div>
+    <div class="browser-body">
+      <div class="bm-title">Bookmarks</div>
+      <div class="tree">
+        <div class="row">
+          <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+          <span>Organized Bookmarks</span>
+        </div>
+        <div class="row indent1">
+          <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+          <span>2026</span>
+        </div>
+        <div class="row indent2">
+          <svg class="folder-icon" viewBox="0 0 24 24" fill="#8b85f0"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+          <span>August</span>
+        </div>
+        <div class="row indent2 active">
+          <svg class="folder-icon" viewBox="0 0 24 24" fill="#8b85f0"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+          <span>September</span>
+        </div>
+        <div class="row indent3">
+          <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+          <span>Weekend Trail Running Routes</span>
+        </div>
+        <div class="row indent3">
+          <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+          <span>Remote Job Boards Worth Checking</span>
+        </div>
+        <div class="row indent3">
+          <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+          <span>Budget Travel Guide — Southeast Asia</span>
+        </div>
+        <div class="row indent1">
+          <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+          <span>2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

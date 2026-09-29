@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+  }
+  body {
+    background-color: #fbf3e3;
+    background-image:
+      radial-gradient(circle, rgba(79,70,229,0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+    font-family: 'Kalam', cursive;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .frame {
+    position: relative;
+    width: 1040px;
+    height: 490px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .frame-border {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .icon {
+    width: 130px;
+    height: 130px;
+    margin-bottom: 6px;
+  }
+  .name {
+    font-size: 82px;
+    font-weight: 700;
+    color: #4338ca;
+    margin: 6px 0 0;
+    line-height: 1;
+  }
+  .underline {
+    width: 360px;
+    height: 22px;
+    margin-top: -4px;
+  }
+  .tagline {
+    font-size: 28px;
+    font-weight: 400;
+    color: #44403c;
+    max-width: 720px;
+    line-height: 1.5;
+    margin: 18px 0 0;
+  }
+  .doodle {
+    position: absolute;
+    color: #4338ca;
+    opacity: 0.85;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <svg class="frame-border" viewBox="0 0 1040 490">
+      <defs>
+        <filter id="wobbleBig">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="9"/>
+        </filter>
+      </defs>
+      <rect x="12" y="12" width="1016" height="466" rx="28" fill="none" stroke="#4338ca" stroke-width="4" filter="url(#wobbleBig)"/>
+    </svg>
+
+    <svg class="doodle" style="top:40px; left:70px; width:46px; height:46px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" filter="url(#wobbleBig)">
+      <path d="M12 2 L12 8 M12 16 L12 22 M2 12 L8 12 M16 12 L22 12 M5 5 L8.5 8.5 M15.5 15.5 L19 19 M5 19 L8.5 15.5 M15.5 8.5 L19 5"/>
+    </svg>
+    <svg class="doodle" style="top:60px; right:75px; width:34px; height:34px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="9" filter="url(#wobbleBig)"/>
+    </svg>
+    <svg class="doodle" style="bottom:48px; left:110px; width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 12 Q 12 4 20 12 Q 12 20 4 12 Z" filter="url(#wobbleBig)"/>
+    </svg>
+    <svg class="doodle" style="bottom:56px; right:100px; width:40px; height:40px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M12 3 L12 21 M3 12 L21 12" filter="url(#wobbleBig)"/>
+    </svg>
+
+    <div class="content">
+      <svg class="icon" viewBox="0 0 100 100">
+        <rect x="8" y="8" width="84" height="84" rx="18" fill="none" stroke="#4338ca" stroke-width="3" filter="url(#wobbleBig)"/>
+        <path d="M32,22 L64,22 L64,52 L48,68 L32,52 Z" fill="none" stroke="#4338ca" stroke-width="3.5" stroke-linejoin="round" filter="url(#wobbleBig)"/>
+      </svg>
+      <h1 class="name">Chronomark</h1>
+      <svg class="underline" viewBox="0 0 360 22">
+        <path d="M4,12 Q 90,2 180,12 T 356,12" fill="none" stroke="#4338ca" stroke-width="4" stroke-linecap="round" filter="url(#wobbleBig)"/>
+      </svg>
+      <p class="tagline">Organizes your bookmarks into Year/Month folders, finds duplicates, and makes everything searchable — 100% local.</p>
+    </div>
+  </div>
+</body>
+</html>

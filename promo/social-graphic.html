@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+  }
+  body {
+    background: linear-gradient(135deg, #4f46e5 0%, #6a5cf5 55%, #8b7bf7 100%);
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #ffffff;
+  }
+  .icon {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 28px;
+  }
+  .name {
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin: 0 0 16px;
+  }
+  .tagline {
+    font-size: 26px;
+    font-weight: 400;
+    opacity: 0.92;
+    max-width: 780px;
+    line-height: 1.4;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg class="icon" viewBox="0 0 100 100">
+      <rect x="2" y="2" width="96" height="96" rx="22" fill="rgba(255,255,255,0.14)"/>
+      <path d="M28,10 L66,10 L66,37.5 L47,60 L28,37.5 Z" fill="#f8fafc"/>
+    </svg>
+    <h1 class="name">Chronomark</h1>
+    <p class="tagline">Organizes bookmarks into Year/Month folders, finds duplicates, and makes everything searchable — 100% local.</p>
+  </div>
+</body>
+</html>
