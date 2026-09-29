@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 800px;
+    background-color: #fbf3e3;
+    background-image: radial-gradient(circle, rgba(79,70,229,0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .caption {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 42px;
+    color: #4338ca;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .frame-wrap { position: relative; width: 1080px; height: 600px; }
+  .frame-border { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .browser {
+    position: absolute;
+    top: 14px; left: 14px;
+    width: calc(100% - 28px);
+    height: calc(100% - 28px);
+    background: #fffdf8;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .browser-top {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    gap: 14px;
+    border-bottom: 2px solid #e5ddc8;
+    flex-shrink: 0;
+  }
+  .addr {
+    flex: 1;
+    max-width: 420px;
+    height: 26px;
+    border-radius: 13px;
+    border: 2px solid #4338ca;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: #6b6455;
+    font-family: 'Kalam', cursive;
+    font-size: 14px;
+  }
+  .browser-body { position: relative; flex: 1; background: #fffdf8; }
+  .placeholder-block { position: absolute; background: #f1ead6; border: 2px solid #e5ddc8; border-radius: 8px; }
+  .popup-anchor { position: absolute; top: 24px; right: 44px; }
+
+  .shell {
+    font: 14px/1.4 Arial, sans-serif;
+    width: 340px;
+    padding: 14px;
+    background: #f0f1f4;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.22);
+  }
+  .shell h1 { font-size: 15px; margin: 0 0 8px; }
+  .search-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 20px; padding: 7px 12px; margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  }
+  .search-icon { font-size: 14px; opacity: 0.55; }
+  .search-bar input { border: none; outline: none; background: transparent; flex: 1; font: inherit; font-size: 13px; color: #333; }
+  .search-clear { opacity: 0.5; font-size: 13px; padding: 0 2px; }
+  .search-result { background: #fff; border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; }
+  .search-result-title { display: block; color: #1a0dab; text-decoration: none; font-size: 13px; }
+  .search-result-meta { font-size: 11px; color: #888; margin-top: 2px; }
+</style>
+</head>
+<body>
+  <div class="caption">Find anything you've ever saved</div>
+  <div class="frame-wrap">
+    <svg class="frame-border" viewBox="0 0 1080 600">
+      <defs>
+        <filter id="wobble">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="12" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="8"/>
+        </filter>
+      </defs>
+      <rect x="6" y="6" width="1068" height="588" rx="18" fill="none" stroke="#4338ca" stroke-width="4" filter="url(#wobble)"/>
+    </svg>
+    <div class="browser">
+      <div class="browser-top">
+        <svg width="70" height="16" viewBox="0 0 70 16">
+          <circle cx="8" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+          <circle cx="35" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+          <circle cx="62" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+        </svg>
+        <div class="addr">example.com</div>
+      </div>
+      <div class="browser-body">
+        <div class="placeholder-block" style="top:36px; left:36px; width:130px; height:14px;"></div>
+        <div class="placeholder-block" style="top:70px; left:36px; width:290px; height:200px;"></div>
+        <div class="placeholder-block" style="top:70px; left:346px; width:290px; height:200px;"></div>
+
+        <div class="popup-anchor">
+          <div class="shell">
+            <h1>Chronomark</h1>
+            <div class="search-bar">
+              <span class="search-icon">🔍</span>
+              <input type="text" value="pasta recipes">
+              <span class="search-clear">✕</span>
+            </div>
+            <div id="searchResults">
+              <div class="search-result">
+                <a class="search-result-title">20-Minute Weeknight Pasta Recipes</a>
+                <div class="search-result-meta">2026 / March — cooking.example.com/weeknight-pasta</div>
+              </div>
+              <div class="search-result">
+                <a class="search-result-title">Simple Homemade Pasta Dough Guide</a>
+                <div class="search-result-meta">2025 / November — baking.example.com/pasta-dough</div>
+              </div>
+              <div class="search-result">
+                <a class="search-result-title">Best Vegetarian Pasta Bakes</a>
+                <div class="search-result-meta">Bookmarks bar — foodblog.example.com/veg-pasta-bakes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

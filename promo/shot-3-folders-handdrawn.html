@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1280px;
+    height: 800px;
+    background-color: #fbf3e3;
+    background-image: radial-gradient(circle, rgba(79,70,229,0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .caption {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 42px;
+    color: #4338ca;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .frame-wrap { position: relative; width: 1080px; height: 600px; }
+  .frame-border { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .browser {
+    position: absolute;
+    top: 14px; left: 14px;
+    width: calc(100% - 28px);
+    height: calc(100% - 28px);
+    background: #fffdf8;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .browser-top {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    gap: 14px;
+    border-bottom: 2px solid #e5ddc8;
+    flex-shrink: 0;
+  }
+  .addr {
+    flex: 1;
+    max-width: 420px;
+    height: 26px;
+    border-radius: 13px;
+    border: 2px solid #4338ca;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: #6b6455;
+    font-family: 'Kalam', cursive;
+    font-size: 14px;
+  }
+  .browser-body {
+    position: relative;
+    flex: 1;
+    background: #fffdf8;
+    padding: 28px 44px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  .bm-title { font-size: 20px; font-weight: 600; color: #26282e; margin: 0 0 16px; }
+  .tree { color: #3c3f44; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .folder-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .bookmark-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.45; }
+  .indent1 { margin-left: 28px; }
+  .indent2 { margin-left: 56px; }
+  .indent3 { margin-left: 84px; font-size: 13px; color: #55585e; }
+  .row.active { background: #eef0fd; border-radius: 8px; }
+</style>
+</head>
+<body>
+  <div class="caption">Organized by Year, then Month</div>
+  <div class="frame-wrap">
+    <svg class="frame-border" viewBox="0 0 1080 600">
+      <defs>
+        <filter id="wobble">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="19" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="8"/>
+        </filter>
+      </defs>
+      <rect x="6" y="6" width="1068" height="588" rx="18" fill="none" stroke="#4338ca" stroke-width="4" filter="url(#wobble)"/>
+    </svg>
+    <div class="browser">
+      <div class="browser-top">
+        <svg width="70" height="16" viewBox="0 0 70 16">
+          <circle cx="8" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+          <circle cx="35" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+          <circle cx="62" cy="8" r="6" fill="none" stroke="#4338ca" stroke-width="2" filter="url(#wobble)"/>
+        </svg>
+        <div class="addr">chrome://bookmarks</div>
+      </div>
+      <div class="browser-body">
+        <div class="bm-title">Bookmarks</div>
+        <div class="tree">
+          <div class="row">
+            <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            <span>Organized Bookmarks</span>
+          </div>
+          <div class="row indent1">
+            <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            <span>2026</span>
+          </div>
+          <div class="row indent2">
+            <svg class="folder-icon" viewBox="0 0 24 24" fill="#8b85f0"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            <span>August</span>
+          </div>
+          <div class="row indent2 active">
+            <svg class="folder-icon" viewBox="0 0 24 24" fill="#8b85f0"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            <span>September</span>
+          </div>
+          <div class="row indent3">
+            <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+            <span>Weekend Trail Running Routes</span>
+          </div>
+          <div class="row indent3">
+            <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+            <span>Remote Job Boards Worth Checking</span>
+          </div>
+          <div class="row indent3">
+            <svg class="bookmark-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M6 2h12a1 1 0 0 1 1 1v19l-7-4-7 4V3a1 1 0 0 1 1-1z"/></svg>
+            <span>Budget Travel Guide — Southeast Asia</span>
+          </div>
+          <div class="row indent1">
+            <svg class="folder-icon" viewBox="0 0 24 24" fill="#4f46e5"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+            <span>2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
