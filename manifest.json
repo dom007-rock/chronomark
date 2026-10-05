@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chronomark",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Files your bookmarks into Year / Month folders without touching your originals.",
   "permissions": ["bookmarks", "storage"],
   "background": {
