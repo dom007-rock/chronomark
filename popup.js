@@ -41,6 +41,11 @@ const MAX_SEARCH_RESULTS = 50;
 
 async function refreshPendingLine() {
   const pending = await getPending();
+  // Re-sync the badge here too, not just in background.js's onWake -- disabling
+  // then re-enabling the extension doesn't reliably fire onStartup/onInstalled,
+  // so the badge can go stale (cleared) while storage still has real pending
+  // items. Popup-open is a guaranteed moment to catch and fix that.
+  await updateBadge(pending.length);
   if (pending.length === 0) {
     pendingLine.textContent = "You're all caught up — no new bookmarks waiting.";
     fileNewBtn.disabled = true;
