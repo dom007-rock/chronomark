@@ -4,6 +4,15 @@
   "version": "0.1.1",
   "description": "Files your bookmarks into Year / Month folders without touching your originals.",
   "permissions": ["bookmarks", "storage"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+B",
+        "mac": "Command+Shift+B"
+      },
+      "description": "Open Chronomark"
+    }
+  },
   "background": {
     "service_worker": "background.js"
   },
